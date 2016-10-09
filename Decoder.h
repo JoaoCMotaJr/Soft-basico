@@ -176,12 +176,9 @@ void getDecoded(char* instruction, char* op1, char* op2, char* op3,  char* decod
     else if(strcmp(instruction, "jump") == 0){ /*00111 000 AAAAAAAA*/
 		strcpy(sixteen_bit_inst, "00111"); /*5bits*/
         strcat(sixteen_bit_inst, "000"); /*3bis*/
-		printf("\nw= %s", op1);
         int counter = searchILC(ilc, op1);
-		printf("\nw= 2");
 
         strcat(sixteen_bit_inst, getDecimalToBinary2(ilc[counter].line)); /*8bits*/
-				printf("\nw= 3");
 
     }
     
@@ -234,8 +231,8 @@ void getDecoded(char* instruction, char* op1, char* op2, char* op3,  char* decod
     
     else if(strcmp(instruction, "moveSp") == 0){ /*01111 RRR 00000000*/
         strcpy(sixteen_bit_inst, "01111"); /*5bits*/
-        strcat(sixteen_bit_inst, getRegisterToBinary(op1)); /*3bits*/
-        strcat(sixteen_bit_inst, getSignedDecimalToBinary("00000000")); /*8bits*/
+        strcat(sixteen_bit_inst, "000"); /*3bits*/
+        strcat(sixteen_bit_inst, getSignedDecimalToBinary(op1)); /*8bits*/
     }
     
     else if(strcmp(instruction, "slt") == 0){ /*01000 RRR RRR RRR 00*/
@@ -250,7 +247,7 @@ void getDecoded(char* instruction, char* op1, char* op2, char* op3,  char* decod
         strcpy(sixteen_bit_inst, "10001"); /*5bits*/
         strcat(sixteen_bit_inst, "000"); /*3bits*/
         
-        int counter = searchILC (ilc, op2);
+        int counter = searchILC (ilc, op1);
         strcat(sixteen_bit_inst, getDecimalToBinary2(ilc[counter].line)); /*8bits*/
     }
     
@@ -551,7 +548,6 @@ char* getSignedDecimalToBinary(char* chardec){
             }
         }
     }
-        printf("\n\n binary %s, int %s", binary, chardec);
 
 	binary++;
     return binary;

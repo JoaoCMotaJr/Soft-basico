@@ -9,18 +9,13 @@
 
 #include "Decoder.h"
 
-const char* file_in = "W2-3.a";
- const char* file_out = "output3.mif";
-/*const char* file_in = "/Users/fabiolelis/Git/SoftwareBasicoTP/SoftwareBasicoTP/W2-1.a";
-const char* file_out = "/Users/fabiolelis/Git/SoftwareBasicoTP/SoftwareBasicoTP/output.mif";*/
 
-
-int readFile(char** input);
+int readFile(char** input, char* file_in);
 void split_line();
 int check_label();
 int check_comment(char* line);
 int check_data();
-void writeFile(char** output, int input_size);
+void writeFile(char** output, int input_size, char* file_out);
 void savedata(char** output, int value, int line_number);
 
 int current_fragment;
@@ -28,13 +23,18 @@ int current_fragment;
 
 int main(int argc, const char * argv[]) {
     
+	char* file_in = (char*)malloc(sizeof(char) * 20);
+	stpcpy(file_in, argv[1]);
+	char* file_out = (char*)malloc(sizeof(char) * 20);
+	stpcpy(file_out, argv[2]);
+	
     char** input = (char**)malloc(sizeof(char) * 256 * 30);
     char** output = (char**)malloc(sizeof(char) * 256 * 30);
     int input_size = 0;
     int line_number = 0;
     
     printf("started reading file \n");
-    input_size = readFile(input);
+    input_size = readFile(input, file_in);
     fflush(stdout);
     
     init_output(output);
@@ -141,8 +141,8 @@ int main(int argc, const char * argv[]) {
         
     }
         printf("\n\n step 3 \n\n"); 
-    writeFile(output, input_size);
-    printf("\nwrote output in %s \n", file_in);
+    writeFile(output, input_size, file_out);
+    printf("\nwrote output in %s \n", file_out);
     
     free(output);
     free(input);
@@ -169,7 +169,7 @@ void savedata(char** output, int value, int line_number)
 
 
 
-int readFile(char* input[]){
+int readFile(char* input[], char* file_in){
     FILE* fp;
     char* line = NULL;
     size_t len = 30;
@@ -309,7 +309,7 @@ int check_data(char* line){
 
 
 
-void writeFile(char** output, int input_size){
+void writeFile(char** output, int input_size, char* file_out){
     FILE* fp;
     	printf(" \n\n Start of file write\n");
     fp = fopen(file_out , "w");
