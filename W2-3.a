@@ -1,69 +1,69 @@
-_start: clear R0 ;
-	clear R1 ;
-	clear R2 ;
-	loadi R0 IO ;
-	loadc R1 0 ;
-	seq R2 R1 R0 ;
-	move R3 R2 ;
-	jmpp R3 _add ;
-	loadc R1 1 ;
-	seq R2 R1 R0 ;
-	jmpp R2 _sub ;
-        loadc R1 2 ;
-	seq R2 R1 R0 ;
-	jmpp R2 _mul ;
-        loadc R1 3 ;
-	seq R2 R1 R0 ;
-	jmpp R2 _div ;
-        loadc R1 4 ;
-	seq R2 R1 R0 ;
-	jmpp R2 _slt ;
-	loadc R1 5 ;
-	seq R2 R1 R0 ;
-	jmpp R2 _exit ;
-_add:   loadi R0 IO ;
-        storeSp R0 0 ; 
-        loadi R0 IO ;
-        storeSp R0 -2 ; 
-        loadSp R2 0 ;
-	loadSp R1 -2 ;
-	add R1 R2 ;
-	storei R1 IO ;
-        jump _start ;
-_sub:   loadi R0 IO ;
-        storeSp R0 0 ; 
-        loadi R0 IO ;
-        storeSp R0 -2 ; 
-        loadSp R1 0 ;
-	loadSp R2 -2 ;
-        subtract R1 R2 ;
-	storei R1 IO ;
-        jump _start ;
-_mul:   loadi R0 IO ;
-        storeSp R0 0 ; 
-        loadi R0 IO ;
-        storeSp R0 -2 ; 
-        loadSp R2 0 ;
-	loadSp R1 -2 ;
-        multiply R1 R2 ;
-	storei R1 IO ;
-        jump _start ;
-_div:   loadi R0 IO ;
-        storeSp R0 0 ; 
-        loadi R0 IO ;
-        storeSp R0 -2 ; 
-        loadSp R1 0 ;
-	loadSp R2 -2 ;
-        divide R1 R2 ;
-	storei R1 IO ;
-        jump _start ;
-_slt:   loadi R0 IO ;
-        storeSp R0 0 ; 
-        loadi R0 IO ;
-        storeSp R0 -2 ; 
-        loadSp R1 0 ;
-	loadSp R2 -2 ;
-        slt R0 R1 R2 ;
-	storei R0 IO ;
-        jump _start ;
+_start: clear R0 ;start of menu
+	clear R1 ;will select 1 option
+	clear R2 ;clear all other values
+	loadi R0 IO ;Reads operation
+	loadc R1 0 ;0 for add
+	seq R2 R1 R0 ;0 for add
+	move R3 R2 ;testing move only
+	jmpp R3 _add ;jump for add
+	loadc R1 1 ;1 for subtraction
+	seq R2 R1 R0 ;1 for subtraction
+	jmpp R2 _sub ;jump for subtraction
+	loadc R1 2 ;2 for multiply
+	seq R2 R1 R0 ;2 for multiply
+	jmpp R2 _mul ;jump for multiply
+	loadc R1 3 ;3 for division
+	seq R2 R1 R0 ;3 for division
+	jmpp R2 _div ;jump for division
+	loadc R1 5 ;5 to end
+	seq R2 R1 R0 ;5 to end
+	jmpp R2 _exit ;jump to end
+	loadc R1 9 ;9 to push num
+	seq R2 R1 R0 ;9 to push num
+	jmpp R2 _push ;9 to push num
+	loadc R3 -1 ; wrong input
+    storei R3 IO ; wrong input
+    jump _start ; reboot
+_add:   call _addp ;go to add
+	jump _start ;back to menu
+_sub:   call _subp ;
+	jump _start ;back to menu
+_mul:   call _mulp ;
+	jump _start ;back to menu
+_div:   call _divp ;
+	jump _start ;back to menu
+_push:   call _pushp ;
+	jump _start ;back to menu
 _exit:  exit ;
+_addp:  loadSp R1 2 ;
+	loadSp R2 4 ;
+	add R1 R2 ;
+	moveSp 2 ;move sp 
+	storeSp R1 2 ;save result
+	storei R1 IO ;print result
+	ret ;return
+_subp:  loadSp R1 2 ;
+	loadSp R2 4 ;
+	subtract R1 R2 ;
+	moveSp 2 ;move sp 
+	storeSp R1 2 ;save result
+	storei R1 IO ;print result
+	ret ;return
+_mulp:  loadSp R1 2 ;
+	loadSp R2 4 ;
+	multiply R1 R2 ;
+	moveSp 2 ;move sp 
+	storeSp R1 2 ;save result
+	storei R1 IO ;print result
+	ret ;return
+_divp:  loadSp R1 2 ;
+	loadSp R2 4 ;
+        divide R1 R2 ;
+        moveSp 2 ;move sp 
+        storeSp R1 2 ;save result
+	storei R1 IO ;print result
+        ret ;return
+_pushp:  loadi R0 IO ; pick num
+    storeSp R0 0 ;save num
+    moveSp -2 ;move sp 
+    ret ;return  
