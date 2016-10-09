@@ -1,34 +1,24 @@
 /*
-  main.c
-  SoftwareBasicoTP
-
-  Created by Fabio Lelis on 25/09/16.
-  Copyright Â© 2016 Fabio Lelis. All rights reserved.
-*/
+ main.c
+ SoftwareBasicoTP
+ 
+ Created by Fabio Lelis on 25/09/16.
+ Copyright Â© 2016 Fabio Lelis. All rights reserved.
+ */
 
 
 #include "Decoder.h"
 
-/*
-typedef struct ilc_struct ILC;
-
-struct ILC{
-    int line;
-    int size;
-    int value;
-    char* label_name;
-};
-*/
-const char* file_in = "teste.a";
-const char* file_out = "output.mif";
-/*const char* file_in = "/Users/fabiolelis/Git/SoftwareBasicoTP/SoftwareBasicoTP/teste.a";
+const char* file_in = "W2-1.a";
+ const char* file_out = "output.mif";
+/*const char* file_in = "/Users/fabiolelis/Git/SoftwareBasicoTP/SoftwareBasicoTP/W2-1.a";
 const char* file_out = "/Users/fabiolelis/Git/SoftwareBasicoTP/SoftwareBasicoTP/output.mif";*/
 
 
 int readFile(char** input);
 void split_line();
 int check_label();
-int check_comment();
+int check_comment(char* line);
 int check_data();
 void writeFile(char** output, int input_size);
 void savedata(char** output, int value, int line_number);
@@ -48,53 +38,89 @@ int main(int argc, const char * argv[]) {
     fflush(stdout);
     
     init_output(output);
-    printf("%s", "\n create ilc");
-    ILC* ilc = (ILC*)malloc(sizeof(ILC)*20);
-    printf("\n ILC created");
-    
-    int label_idx = 0;
-    int data_idx = 180;
-    while(line_number < (input_size)){
-        
-        printf("%s", "\n start loop");
-        fflush(stdout);
+    ILC* ilc = (ILC*)malloc(sizeof(ILC)*16);
+    ILC* ilcData = (ILC*)malloc(sizeof(ILC)*16);
 
+
+    int count_data = 0;
+    while(line_number < (input_size)){
+        fflush(stdout);
+        
         char** line = (char**)malloc(sizeof(char) * 6 * 150);
         char* input_index = (char*) malloc(sizeof(char) * 32);
         strcpy(input_index, input[line_number]);
         split_line(line, input_index);
-        int has_label = check_label(line[0]);
         
+        int has_label = check_label(line[0]);
         int is_data = check_data(line[1+has_label]);
+        count_data += is_data;
+        line_number++;
+	free(line);
+    }
+    printf("\n\n step 1 \n\n"); 
+    
+    line_number = 0;
+    int label_idx = 0;
+    int data_idx = 0;
+    while(line_number < (input_size)){
+        
+        fflush(stdout);
+        
+        char** line = (char**)malloc(sizeof(char) * 6 * 150);
+        char* input_index = (char*) malloc(sizeof(char) * 32);
+        strcpy(input_index, input[line_number]);
+        split_line(line, input_index);
+        
+        char* labelName = (char*)malloc(sizeof(char) * 32);
+
+        
+        int has_label = check_label(line[0]);
+        int is_data = check_data(line[1+has_label]);
+        
         if(has_label){
-            printf("%s"," tem label");
+
             fflush(stdout);
-            ilc[label_idx].line = line_number;
-            ilc[label_idx].label_name = line[0];
-            label_idx++;
-        }
-        if(is_data){
-            printf("%s"," Ã© um .data");
-            ilc[label_idx].line = data_idx;
-            ilc[label_idx].label_name = line[1];
-            ilc[label_idx].size = atoi(line[2]);
-            ilc[label_idx].value = atoi(line[3]);
-            label_idx++;
-	    savedata(output, ilc[label_idx].value, data_idx);
-            data_idx++;data_idx++;
+            ilc[label_idx].line = 2*line_number; /*CPUSim conta a partir do 1*/
+            strcpy(labelName, line[0]);
+            strcpy(labelName, replace(labelName, ":", ""));
             
+            ilc[label_idx].label_name =  labelName;
+	    printf("\n label %s in line  %X;\n", ilc[label_idx].label_name, ilc[label_idx].line);
+            label_idx++;
         }
-        printf("%s", " closing loop");
+						printf("passed\n");
+
+        if(is_data){
+				printf("ANYTHING\n");
+            ilcData[data_idx].line = 2*data_idx + 2*(input_size - count_data);
+            printf("\n\n DATA found %s in line %d", line[0], line_number);
+            strcpy(labelName, line[0]);
+            strcpy(labelName, replace(labelName, ":", ""));
+            ilcData[data_idx].label_name =  labelName;
+            
+            ilcData[data_idx].size = atoi(line[2]);
+            ilcData[data_idx].value = atoi(line[3]);
+            label_idx++;
+
+	     
+	     printf("\n data %s in line %X with value ", ilcData[data_idx].label_name , ilcData[data_idx].line);
+	      printf(" %X\n",  ilcData[data_idx].value);
+           
+            /*Salvar data em posições de memória após o fim input_size ... */
+            savedata(output, ilcData[data_idx].value, ilcData[data_idx].line);
+            data_idx++;/*data_idx++;*/
+	   
+        }
         fflush(stdout);
         
         line_number++;
     }
     fflush(stdout);
-    printf("%s", "\n end loop");
+        printf("\n\n step 2 \n\n"); 
     
     line_number = 0;
     
-	while(line_number < (input_size)){
+    while(line_number < (input_size)){
         
         char** line = (char**)malloc(sizeof(char) * 6 * 150);
         char* input_index = (char*) malloc(sizeof(char) * 32);
@@ -102,70 +128,86 @@ int main(int argc, const char * argv[]) {
         split_line(line, input_index);
         int has_label = check_label(line[0]);
         int is_data = check_data(line[1+has_label]);
-        
-        
+
         if(is_data){
+            line_number++;
             continue;
         }
-        
-        
-        /*Cada pedaÃ§o da instrucao em line[pos] agora*/
-        decode(line, output, line_number, has_label, ilc);
-        line_number++;
 
+        /*Cada pedaÃ§o da instrucao em line[pos] agora*/
+        decode(line, output, line_number, has_label, ilc, ilcData);
+        line_number++;
+        
         
     }
-    
-
-    
-    printf("\n end loop 2");
-    
+        printf("\n\n step 3 \n\n"); 
     writeFile(output, input_size);
-    printf("\n wrote it");
+    printf("\nwrote output in %s \n", file_in);
     
     free(output);
     free(input);
+    
     
     return 0;
 }
 
 void savedata(char** output, int value, int line_number)
-{	
-	char* binary = (char*) malloc(sizeof(char) * 16);
-	char* decoded1 = (char*) malloc(sizeof(char) * 8);
-	char* decoded2 = (char*) malloc(sizeof(char) * 8);
-	strcpy(binary, getDecimalToBinary3(value));
-	splitInTwo(binary, decoded1, decoded2);
-	strcpy(output[2*line_number], decoded1);
-    	strcpy(output[2*line_number + 1], decoded2);
-
+{
+    char* binary = (char*) malloc(sizeof(char) * 16);
+    char* decoded1 = (char*) malloc(sizeof(char) * 8);
+    char* decoded2 = (char*) malloc(sizeof(char) * 8);
+    strcpy(binary, getDecimalToBinary3(value));
+    splitInTwo(binary, decoded1, decoded2);
+    strcpy(output[line_number], decoded1);
+    strcpy(output[line_number + 1], decoded2);
+    
 }
+
+
+
+
+
+
 
 int readFile(char* input[]){
     FILE* fp;
     char* line = NULL;
-    size_t len = 0;
-    int read;
+    size_t len = 30;
+    ssize_t read;
     int i = 0;
-    printf("\n reading");
+
     fp = fopen(file_in , "r");
     if (fp == NULL)
         printf("Endereco invalido");
     
-    while (((read = getline(&line, &len, fp)) !=-1)) {
-        printf("%d",i);
-        input[i] = (char *) malloc(200*sizeof(char));
+    while ((read = getline(&line, &len, fp)) !=-1) {
+        
+        input[i] = (char *) malloc(30*sizeof(char));
+        strcpy(line, replace(line, "\t", ""));
+        
+        if(check_comment(line)){
+            continue;
+        }
         strcpy(input[i], line);
-        printf("%s", input[i]);
+	free(line);
+	line = NULL;
+        printf("%d %s", i, input[i]);
         i++;
     }
     fclose(fp);
-    
-    free(line);
-    
-    return i - 1;
+    return i ;
     
 }
+
+
+
+
+
+
+
+
+
+
 
 void split_line(char** line, char* input){
     line[0] = (char *) malloc(32*sizeof(char));
@@ -180,7 +222,21 @@ void split_line(char** line, char* input){
     }
 }
 
+
+
+
+
+
+
+
+
+
+
 int check_label(char* line){
+    
+    if(line == NULL)
+        return 0;
+    
     switch (line[0]) {
         case '_':
             return 1;
@@ -190,6 +246,37 @@ int check_label(char* line){
             break;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+int check_comment(char* line){
+    
+    if(line == NULL)
+        return 1;
+    if(strlen(line) == 0)
+        return 1;
+    if(line[0] == '\n')
+        return 1;
+    
+    
+    switch (line[0]) {
+        case ';':
+            return 1;
+            break;
+        default:
+            return 0;
+            break;
+    }
+}
+
 
 int check_data(char* line){
     if(line == NULL)
@@ -204,9 +291,27 @@ int check_data(char* line){
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void writeFile(char** output, int input_size){
     FILE* fp;
-    
+    	printf(" \n\n Start of file write\n");
     fp = fopen(file_out , "w");
     if (fp == NULL)
         printf("Endereco invalido");
@@ -222,9 +327,10 @@ void writeFile(char** output, int input_size){
     for(i = 0; i < 256; i++){
         
         fprintf(fp, "%X : %s;\n", i, output[i]);
+	printf("%X : %s;\n", i, output[i]);
     }
     
     fprintf(fp, "END;\n");
-    
-    fclose(fp);
+ 	printf( "END;\n");   
+
 }
