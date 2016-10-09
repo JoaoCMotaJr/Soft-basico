@@ -257,13 +257,13 @@ void getDecoded(char* instruction, char* op1, char* op2, char* op3,  char* decod
     else if(strcmp(instruction, "loadSp") == 0){ /*10010 RRR AAAAAAAA*/
         strcpy(sixteen_bit_inst, "10010"); /*5bits*/
         strcat(sixteen_bit_inst, getRegisterToBinary(op1)); /*3bits*/
-        strcat(sixteen_bit_inst, getDecimalToBinary(op2)); /*8bits*/
+        strcat(sixteen_bit_inst, getSignedDecimalToBinary(op2)); /*8bits*/
     }
     
     else if(strcmp(instruction, "storeSp") == 0){ /*10011 RRR AAAAAAAA*/
         strcpy(sixteen_bit_inst, "10011"); /*5bits*/
         strcat(sixteen_bit_inst, getRegisterToBinary(op1)); /*3bits*/
-        strcat(sixteen_bit_inst, getDecimalToBinary(op2)); /*8bits*/
+        strcat(sixteen_bit_inst, getSignedDecimalToBinary(op2)); /*8bits*/
     }
     
     else if(strcmp(instruction, "ret") == 0){ /*10100 00000000000*/
@@ -273,13 +273,13 @@ void getDecoded(char* instruction, char* op1, char* op2, char* op3,  char* decod
     else if(strcmp(instruction, "loadRa") == 0){ /*10101 000 AAAAAAAA*/
         strcpy(sixteen_bit_inst, "10101"); /*5bits*/
         strcat(sixteen_bit_inst, "000"); /*3bits*/
-        strcat(sixteen_bit_inst, getDecimalToBinary(op1)); /*8bits*/
+        strcat(sixteen_bit_inst, getSignedDecimalToBinary(op1)); /*8bits*/
     }
     
     else if(strcmp(instruction, "storeRa")== 0){ /*10110 00000000000*/
         strcpy(sixteen_bit_inst, "10110"); /*5bits*/
         strcat(sixteen_bit_inst, "000"); /*3bits*/
-        strcat(sixteen_bit_inst, getDecimalToBinary(op1)); /*8bits*/
+        strcat(sixteen_bit_inst, getSignedDecimalToBinary(op1)); /*8bits*/
     }
     
     else if(strcmp(instruction, "addi") == 0){ /*10111 000 CCCCCCCC*/
@@ -453,7 +453,6 @@ char* getDecimalToBinary(char* chardec){
         div = div/2;
         
     }
-    
     return binary;
 }
 
@@ -519,7 +518,6 @@ char* getSignedDecimalToBinary(char* chardec){
     
     char* binary = (char*) malloc(sizeof(char) * 9);
     int dec = atoi(chardec);
-    strcpy(binary, "0");
     
     int decNeg = dec;
     
@@ -528,7 +526,7 @@ char* getSignedDecimalToBinary(char* chardec){
         dec --;
     }
     
-    int div = 128;
+    int div = 256;
     while(div >= 1){
         if(dec >= div){
             strcat(binary, "1");
@@ -544,7 +542,7 @@ char* getSignedDecimalToBinary(char* chardec){
     
     if(decNeg < 0){
         int i = 0;
-        for(i = 0; i < 8; i++){
+        for(i = 0; i < 9; i++){
             if(binary[i] == '0'){
                 binary[i] = '1';
             }
@@ -553,7 +551,8 @@ char* getSignedDecimalToBinary(char* chardec){
             }
         }
     }
-    
+        printf("\n\n binary %s, int %s", binary, chardec);
+
 	binary++;
     return binary;
 }

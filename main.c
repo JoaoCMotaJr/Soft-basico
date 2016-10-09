@@ -9,8 +9,8 @@
 
 #include "Decoder.h"
 
-const char* file_in = "W2-2.a";
- const char* file_out = "output2.mif";
+const char* file_in = "W2-3.a";
+ const char* file_out = "output3.mif";
 /*const char* file_in = "/Users/fabiolelis/Git/SoftwareBasicoTP/SoftwareBasicoTP/W2-1.a";
 const char* file_out = "/Users/fabiolelis/Git/SoftwareBasicoTP/SoftwareBasicoTP/output.mif";*/
 
